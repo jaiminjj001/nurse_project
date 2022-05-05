@@ -1,0 +1,211 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <p-toolbar styleClass="p-mb-4">
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        pRipple
+        label="Add Nurse"
+        icon="pi pi-plus"
+        class="p-button-success p-mr-2"
+        (click)="openNew()"
+      ></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-fileUpload
+        mode="basic"
+        accept="image/*"
+        [maxFileSize]="1000000"
+        label="Import"
+        chooseLabel="Import"
+        class="p-mr-2 p-d-inline-block"
+      ></p-fileUpload>
+      <button
+        pButton
+        pRipple
+        label="Export"
+        icon="pi pi-upload"
+        class="p-button-help"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="nurses"
+    [rows]="10"
+    [paginator]="true"
+    [(selection)]="selectedProducts"
+    [rowHover]="true"
+    [globalFilterFields]="['name']"
+    dataKey="id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        <h5 class="p-m-0">Nurses List</h5>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($event.target.value, 'contains')"
+            placeholder="Search..."
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <!-- <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th> -->
+        <th pSortableColumn="name">
+          Name <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="phone">
+          Phone No <p-sortIcon field="phone"></p-sortIcon>
+        </th>
+        <th pSortableColumn="email_id">
+          Email ID <p-sortIcon field="email_id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="preferred_location">
+          Preferred Location
+          <p-sortIcon field="preferred_location"></p-sortIcon>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-nurse>
+      <tr>
+        <!-- <td>
+          <p-tableCheckbox [value]="nurses"></p-tableCheckbox>
+        </td> -->
+        <td>{{ nurse.name }}</td>
+        <td>{{ nurse.phone }}</td>
+        <td>{{ nurse.email_id }}</td>
+        <td>{{ nurse.preferred_location }}</td>
+        <td>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success p-mr-2"
+            (click)="editNurse(nurse)"
+          ></button>
+          <button
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning"
+            (click)="deleteNurse(nurse)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="p-d-flex p-ai-center p-jc-between">
+        In total there are {{ nurses ? nurses.length : 0 }} nurses.
+      </div>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="nurseDialog"
+  [style]="{ width: '450px' }"
+  header="Nurse Details"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="p-field">
+      <label for="name">Name</label>
+      <input
+        type="text"
+        pInputText
+        id="name"
+        [(ngModel)]="nurse.name"
+        required
+        autofocus
+      />
+      <small class="p-invalid" *ngIf="submitted && !nurse.name"
+        >Name is required.</small
+      >
+    </div>
+    <div class="p-field p-col">
+      <label for="quantity">Preferred Location</label>
+      <p-autoComplete
+        [(ngModel)]="nurse.preferred_location"
+        [suggestions]="results"
+        (completeMethod)="search($event)"
+        [dropdown]="true"
+      >
+        <ng-template let-ploc pTemplate="item">
+          <!-- <div class="nurse-item"> -->
+          <div>{{ ploc }}</div>
+          <!-- </div> -->
+        </ng-template>
+      </p-autoComplete>
+    </div>
+    <div class="p-field">
+      <label for="phone">Address</label>
+      <textarea
+        id="phone"
+        pInputTextarea
+        [(ngModel)]="nurse.address"
+        required
+        rows="2"
+        cols="20"
+      ></textarea>
+    </div>
+
+    <div class="p-field">
+      <label for="email">Email ID</label>
+      <input
+        type="text"
+        pInputText
+        id="email"
+        [(ngModel)]="nurse.email_id"
+        required
+        autofocus
+      />
+    </div>
+
+    <div class="p-field p-col">
+      <label for="price">Phone No.</label>
+      <input
+        type="text"
+        pInputText
+        id="phone"
+        [(ngModel)]="nurse.phone"
+        required
+        autofocus
+      />
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="hideDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Save"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveNurse()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
